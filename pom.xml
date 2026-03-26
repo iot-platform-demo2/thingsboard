@@ -839,6 +839,8 @@
                             <exclude>**/resources/lwm2m/models/**</exclude>
                             <exclude>src/main/data/resources/**</exclude>
                             <exclude>.claude/**</exclude>
+                            <exclude>**/eslint.config.mjs</exclude>
+                            <exclude>**/*.otf</exclude>
                         </excludes>
                         <mapping>
                             <proto>JAVADOC_STYLE</proto>

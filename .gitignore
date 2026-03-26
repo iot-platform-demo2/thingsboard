@@ -38,3 +38,6 @@ rebuild-docker.sh
 .run/**
 .run
 .claude/
+
+# Local Maven distribution (do not commit)
+.tools/
