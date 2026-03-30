@@ -15,7 +15,7 @@
 ///
 
 export const environment = {
-  appTitle: 'ThingsBoard',
+  appTitle: 'Newgen',
   production: true,
   apiBaseUrl: '',
 // @ts-ignore

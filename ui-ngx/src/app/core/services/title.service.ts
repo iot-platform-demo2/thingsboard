@@ -22,6 +22,18 @@ import { filter } from 'rxjs/operators';
 
 import { environment as env } from '@env/environment';
 
+/** Browser tab label: show "Newgen" for any casing of the product name. */
+function appTitleForDocument(): string {
+  const t = env.appTitle?.trim() ?? '';
+  if (!t) {
+    return 'Newgen';
+  }
+  if (/^newgen$/i.test(t)) {
+    return 'Newgen';
+  }
+  return t;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -41,15 +53,16 @@ export class TitleService {
     }
     const { title } = lastChild.data;
     const translate = lazyTranslate || this.translate;
+    const appTitle = appTitleForDocument();
     if (title) {
       translate
         .get(title)
         .pipe(filter(translatedTitle => translatedTitle !== title))
         .subscribe(translatedTitle =>
-          this.title.setTitle(`${env.appTitle} | ${translatedTitle}`)
+          this.title.setTitle(`${appTitle} | ${translatedTitle}`)
         );
     } else {
-      this.title.setTitle(env.appTitle);
+      this.title.setTitle(appTitle);
     }
   }
 }

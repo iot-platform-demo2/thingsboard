@@ -19,7 +19,7 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  appTitle: 'ThingsBoard',
+  appTitle: 'Newgen',
   production: false,
   /**
    * When set (e.g. local UI on localhost), HTTP API and WebSocket use this origin so requests
