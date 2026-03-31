@@ -868,7 +868,7 @@
                         <execution>
                             <id>get-the-git-infos</id>
                             <goals>
-                                <goal>revision</goal>p
+                                <goal>revision</goal>
                             </goals>
                             <phase>initialize</phase>
                         </execution>
