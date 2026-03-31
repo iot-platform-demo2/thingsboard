@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThingsBoard Backend-Only / No-UI Modes</title>
+  <style>
+    :root {
+      --bg: #f6f4ee;
+      --panel: #fffdfa;
+      --text: #1e293b;
+      --muted: #5b6678;
+      --line: #ddd6c8;
+      --accent: #0f766e;
+      --accent-soft: #dff5f1;
+      --warn: #8a5a00;
+      --code-bg: #20252f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+      background:
+        radial-gradient(circle at top right, #dff1ec 0, transparent 26%),
+        radial-gradient(circle at bottom left, #f7e7d1 0, transparent 28%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 36px 20px 72px; }
+    .hero, .section {
+      background: rgba(255, 253, 250, 0.9);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 26px;
+      box-shadow: 0 12px 36px rgba(46, 41, 34, 0.08);
+    }
+    .section { margin-top: 22px; }
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    h1, h2, h3 { margin: 0 0 12px; line-height: 1.2; }
+    h1 { margin-top: 14px; font-size: clamp(30px, 5vw, 48px); }
+    h2 { margin-top: 6px; font-size: 28px; }
+    h3 { margin-top: 18px; font-size: 20px; }
+    p, li { color: var(--muted); font-size: 16px; }
+    code {
+      font-family: "JetBrains Mono", monospace;
+      background: #f1eee7;
+      padding: 2px 6px;
+      border-radius: 6px;
+      color: #243042;
+    }
+    pre {
+      margin: 12px 0 0;
+      padding: 16px;
+      border-radius: 16px;
+      overflow-x: auto;
+      background: var(--code-bg);
+      color: #f8fafc;
+      border: 1px solid #2f3642;
+    }
+    pre code { background: transparent; color: inherit; padding: 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--panel);
+    }
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #f4f1e8; }
+    tr:last-child td { border-bottom: 0; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      background: var(--panel);
+    }
+    .warn { color: var(--warn); font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="eyebrow">ThingsBoard / Backend Only</div>
+      <h1>Hướng Dẫn Riêng Cho Các Mode No UI</h1>
+      <p>Trang này chỉ tập trung vào các mode giúp backend không serve embedded UI, hoặc đi xa hơn là build/package mà không kéo <code>ui-ngx</code> vào runtime classpath của <code>application</code>.</p>
+      <p><strong>Note quan trọng:</strong> full UI vẫn là hành vi mặc định. Bạn không cần sửa tay <code>application/pom.xml</code> để bật lại UI. Chế độ no-ui chỉ xuất hiện khi bạn chủ động dùng config <code>Backend Only</code>, <code>No UI</code>, hoặc Maven option <code>-P!embedded-ui</code>.</p>
+    </section>
+
+    <section class="section">
+      <h2>1. Các Mức "No UI"</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Mode</th>
+            <th>Cơ chế</th>
+            <th>Mức tách UI</th>
+            <th>Khi nào dùng</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>backend-only</code></td>
+            <td>Tắt static mapping và tắt SPA forward controller</td>
+            <td>Backend không serve UI, nhưng runtime classpath vẫn có thể còn <code>ui-ngx</code></td>
+            <td>Debug backend nhanh, FE chạy riêng bằng <code>yarn start</code></td>
+          </tr>
+          <tr>
+            <td><code>-P!embedded-ui</code></td>
+            <td>Tắt Maven profile kéo dependency runtime <code>ui-ngx</code></td>
+            <td><code>ui-ngx</code> không còn trong runtime/package classpath của <code>application</code></td>
+            <td>Khi muốn backend-only rõ ràng hơn, package sạch hơn</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>2. Các Run Config Liên Quan</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>TB - Monolith Fast (Backend Only)</h3>
+          <p>Kiểu IntelliJ <code>Application</code>. Nhanh nhất cho monolith backend-only. Dùng profile <code>backend-only</code>.</p>
+        </div>
+        <div class="card">
+          <h3>TB - Core Fast (Backend Only)</h3>
+          <p>Kiểu IntelliJ <code>Application</code>. Dành cho <code>tb-core</code> microservices mode nhưng không serve UI.</p>
+        </div>
+        <div class="card">
+          <h3>TB - Monolith Local (No UI Runtime)</h3>
+          <p>Kiểu Maven. Dùng <code>-P!embedded-ui</code> và profile <code>backend-only</code>.</p>
+        </div>
+        <div class="card">
+          <h3>TB - Monolith Package (No UI)</h3>
+          <p>Kiểu Maven package. Build backend package mà không kéo <code>ui-ngx</code> runtime.</p>
+        </div>
+        <div class="card">
+          <h3>TB - Core Package (No UI)</h3>
+          <p>Kiểu Maven package. Build theo hướng core/no-ui để kiểm tra artifact backend-only.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>3. File Và Cấu Hình Liên Quan</h2>
+      <h3>Profile backend-only</h3>
+      <p>File:</p>
+      <pre><code>application/src/main/resources/thingsboard-backend-only.yml</code></pre>
+      <p>Nó đang bật:</p>
+      <pre><code>ui.embedded.enabled: false
+spring.web.resources.add-mappings: false</code></pre>
+
+      <h3>Tắt SPA forward controller</h3>
+      <p><code>WebConfig</code> chỉ còn active khi:</p>
+      <pre><code>ui.embedded.enabled=true</code></pre>
+
+      <h3>Tắt runtime dependency ui-ngx</h3>
+      <p>Trong <code>application/pom.xml</code>, dependency <code>ui-ngx</code> đã được chuyển vào profile Maven:</p>
+      <pre><code>&lt;profile&gt;
+  &lt;id&gt;embedded-ui&lt;/id&gt;
+  &lt;activation&gt;
+    &lt;activeByDefault&gt;true&lt;/activeByDefault&gt;
+  &lt;/activation&gt;
+  ...
+&lt;/profile&gt;</code></pre>
+      <p>Tức là muốn loại nó khỏi runtime/package thì dùng:</p>
+      <pre><code>-P!embedded-ui</code></pre>
+    </section>
+
+    <section class="section">
+      <h2>4. Nên Dùng Mode Nào</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Tình huống</th>
+            <th>Khuyên dùng</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Debug backend monolith nhanh, FE chạy riêng</td>
+            <td><code>TB - Monolith Fast (Backend Only)</code></td>
+          </tr>
+          <tr>
+            <td>Debug microservices core nhanh, không cần UI embedded</td>
+            <td><code>TB - Core Fast (Backend Only)</code></td>
+          </tr>
+          <tr>
+            <td>Muốn verify Maven runtime không kéo <code>ui-ngx</code></td>
+            <td><code>TB - Monolith Local (No UI Runtime)</code></td>
+          </tr>
+          <tr>
+            <td>Muốn build artifact/package backend-only</td>
+            <td><code>TB - Monolith Package (No UI)</code> hoặc <code>TB - Core Package (No UI)</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2>5. Workflow Gợi Ý Khi Dev FE</h2>
+      <ol>
+        <li>Chạy backend bằng <code>TB - Monolith Fast (Backend Only)</code>.</li>
+        <li>Chạy frontend bằng <code>TB - UI NGX Dev</code> hoặc <code>cd ui-ngx &amp;&amp; yarn start</code>.</li>
+        <li>Mở <code>http://localhost:4200</code> để làm việc với hot reload.</li>
+        <li>Không dùng UI ở <code>http://localhost:8080</code>.</li>
+      </ol>
+    </section>
+
+    <section class="section">
+      <h2>6. Lưu Ý Thực Tế</h2>
+      <ul>
+        <li>Mode <code>backend-only</code> giúp backend không trả UI embedded, nhưng RAM giảm thường chỉ ở mức vừa phải.</li>
+        <li>Nếu muốn tách runtime rõ ràng hơn, hãy dùng các config có <code>No UI Runtime</code> hoặc <code>Package (No UI)</code>.</li>
+        <li><span class="warn">Quan trọng:</span> các config Maven package/build theo <code>-P!embedded-ui</code> vẫn có thể mất thời gian vì còn build backend modules phụ thuộc, chỉ là không kéo UI runtime vào artifact của <code>application</code>.</li>
+      </ul>
+    </section>
+  </div>
+</body>
+</html>

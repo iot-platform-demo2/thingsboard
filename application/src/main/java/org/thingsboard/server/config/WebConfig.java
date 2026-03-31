@@ -17,6 +17,7 @@ package org.thingsboard.server.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.thingsboard.server.utils.MiscUtils;
@@ -24,6 +25,7 @@ import org.thingsboard.server.utils.MiscUtils;
 import java.io.IOException;
 
 @Controller
+@ConditionalOnProperty(prefix = "ui.embedded", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class WebConfig {
 
     @RequestMapping(value = {"/assets", "/assets/", "/{path:^(?!api$)(?!assets$)(?!static$)(?!webjars$)(?!swagger-ui$)[^\\.]*}/**"})
