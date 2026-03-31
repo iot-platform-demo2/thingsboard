@@ -35,8 +35,8 @@ pom.xml.versionsBackup
 .instance_id
 rebuild-docker.sh
 */.run/**
-.run/**
-.run
+#.run/**
+#.run
 .claude/
 
 # Local Maven distribution (do not commit)

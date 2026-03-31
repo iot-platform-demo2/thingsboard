@@ -1,0 +1,31 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="TB - Install DB (monolith demo)" type="MavenRunConfiguration" factoryName="Maven">
+    <MavenSettings>
+      <option name="myGeneralSettings" />
+      <option name="myRunnerSettings" />
+      <option name="myRunnerParameters">
+        <MavenRunnerParameters>
+          <option name="profiles">
+            <set />
+          </option>
+          <option name="goals">
+            <list>
+              <option value="-pl" />
+              <option value="application" />
+              <option value="-am" />
+              <option value="-DskipTests" />
+              <option value="-Dspring-boot.run.profiles=install" />
+              <option value="-Dspring-boot.run.arguments=--install.load_demo=true" />
+              <option value="-Dspring-boot.run.jvmArguments=-DSPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/thingsboard -DSPRING_DATASOURCE_USERNAME=postgres -DSPRING_DATASOURCE_PASSWORD=postgres -DTB_SERVICE_TYPE=monolith -DTB_QUEUE_TYPE=in-memory -DCACHE_TYPE=caffeine -DHTTP_BIND_PORT=8080" />
+              <option value="spring-boot:run" />
+            </list>
+          </option>
+          <option name="pomFileName" value="pom.xml" />
+          <option name="workingDirPath" value="$PROJECT_DIR$" />
+          <option name="resolveToWorkspace" value="false" />
+        </MavenRunnerParameters>
+      </option>
+    </MavenSettings>
+    <method v="2" />
+  </configuration>
+</component>

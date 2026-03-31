@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThingsBoard IntelliJ Run/Debug Guide</title>
+  <style>
+    :root {
+      --bg: #f4f1ea;
+      --panel: #fffdf8;
+      --text: #1f2933;
+      --muted: #52606d;
+      --line: #d9d2c3;
+      --accent: #9c4f2e;
+      --accent-soft: #f3e1d8;
+      --code: #2b2d42;
+      --ok: #1f7a4d;
+      --warn: #946200;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Helvetica Neue", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, #f8e6d8 0, transparent 28%),
+        radial-gradient(circle at bottom right, #e5efe6 0, transparent 30%),
+        var(--bg);
+      line-height: 1.6;
+    }
+
+    .wrap {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 40px 20px 72px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #fff8ee, #fffdf8 58%, #f3ede3);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 28px 28px 22px;
+      box-shadow: 0 12px 40px rgba(75, 57, 38, 0.08);
+    }
+
+    .eyebrow {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h1, h2, h3 {
+      margin: 0 0 12px;
+      line-height: 1.2;
+    }
+
+    h1 {
+      margin-top: 16px;
+      font-size: clamp(32px, 5vw, 52px);
+      letter-spacing: -0.03em;
+    }
+
+    h2 {
+      font-size: 28px;
+      margin-top: 34px;
+    }
+
+    h3 {
+      font-size: 20px;
+      margin-top: 24px;
+    }
+
+    p, li {
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+    }
+
+    .card strong {
+      color: var(--text);
+    }
+
+    .section {
+      margin-top: 26px;
+      background: rgba(255, 253, 248, 0.82);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 26px;
+      backdrop-filter: blur(6px);
+    }
+
+    code {
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      font-size: 0.94em;
+      color: var(--code);
+      background: #f3f0ea;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    pre {
+      margin: 14px 0 0;
+      padding: 16px;
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid #d8d1c5;
+      background: #23262f;
+      color: #f8fafc;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    ul, ol {
+      padding-left: 22px;
+    }
+
+    .badge {
+      display: inline-block;
+      margin-right: 8px;
+      margin-bottom: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #eef2f6;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .ok {
+      color: var(--ok);
+      font-weight: 700;
+    }
+
+    .warn {
+      color: var(--warn);
+      font-weight: 700;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      background: var(--panel);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      background: #f7f3eb;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="eyebrow">ThingsBoard / IntelliJ IDEA</div>
+      <h1>Hướng dẫn Run/Debug Full Project</h1>
+      <p>File này tổng hợp cách dùng bộ shared run configurations trong thư mục <code>.run/</code> cho repo <code>thingsboard</code>. Mục tiêu là chạy nhanh theo 2 mode: <strong>monolith local</strong> và <strong>microservices local</strong>.</p>
+      <div style="margin-top: 14px;">
+        <span class="badge">Java 17</span>
+        <span class="badge">Maven</span>
+        <span class="badge">PostgreSQL</span>
+        <span class="badge">Kafka</span>
+        <span class="badge">ZooKeeper</span>
+        <span class="badge">Redis/Valkey</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>1. Các File Đã Có</h2>
+      <p>Các shared run configs đã được thêm sẵn trong <code>.run/</code>:</p>
+      <div class="grid">
+        <div class="card"><strong>TB - Install DB (monolith demo)</strong><br>Khởi tạo schema PostgreSQL và nạp demo data.</div>
+        <div class="card"><strong>TB - Monolith Local</strong><br>Chạy toàn bộ backend trong một process.</div>
+        <div class="card"><strong>TB - Core</strong><br>Chạy <code>tb-core</code> mode microservices.</div>
+        <div class="card"><strong>TB - Rule Engine</strong><br>Chạy <code>tb-rule-engine</code>.</div>
+        <div class="card"><strong>TB - HTTP/MQTT/COAP/LwM2M/SNMP</strong><br>Các transport services tách riêng.</div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>2. Mở Trong IntelliJ</h2>
+      <ol>
+        <li>Mở project root <code>/mnt/ssd-dev/TB-IOT/thingsboard</code> trong IntelliJ IDEA.</li>
+        <li>Nếu chưa thấy configs, chạy <code>Reload All Maven Projects</code> hoặc mở lại project.</li>
+        <li>Vào góc trên bên phải của IntelliJ và chọn các cấu hình bắt đầu bằng <code>TB - ...</code>.</li>
+        <li>Dùng nút <strong>Run</strong> để chạy thường hoặc <strong>Debug</strong> để debug trực tiếp.</li>
+      </ol>
+      <p><span class="ok">Ưu điểm:</span> các config này dùng <code>MavenRunConfiguration</code>, nên ít bị lỗi do khác tên module IntelliJ giữa các máy.</p>
+    </section>
+
+    <section class="section">
+      <h2>3. Monolith Local</h2>
+      <p>Đây là mode gọn nhất để debug full backend. Repo hiện mặc định phù hợp với monolith local: queue in-memory, service type monolith, cache caffeine, telemetry SQL.</p>
+
+      <h3>Bước 1: chạy PostgreSQL</h3>
+      <pre><code>docker run -d --name tb-postgres \
+  -e POSTGRES_DB=thingsboard \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  postgres:16</code></pre>
+
+      <h3>Bước 2: init database một lần</h3>
+      <p>Trong IntelliJ, chạy config <code>TB - Install DB (monolith demo)</code>.</p>
+      <p>Config này tương đương việc bật Spring profile <code>install</code> và truyền <code>--install.load_demo=true</code>.</p>
+
+      <h3>Bước 3: chạy backend monolith</h3>
+      <p>Trong IntelliJ, chạy hoặc debug config <code>TB - Monolith Local</code>.</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Thông số</th>
+            <th>Giá trị</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>HTTP</td>
+            <td><code>http://localhost:8080</code></td>
+          </tr>
+          <tr>
+            <td>DB</td>
+            <td><code>jdbc:postgresql://localhost:5432/thingsboard</code></td>
+          </tr>
+          <tr>
+            <td>Queue</td>
+            <td><code>in-memory</code></td>
+          </tr>
+          <tr>
+            <td>Cache</td>
+            <td><code>caffeine</code></td>
+          </tr>
+          <tr>
+            <td>Service type</td>
+            <td><code>monolith</code></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Tài khoản mặc định</h3>
+      <ul>
+        <li><code>sysadmin@thingsboard.org / sysadmin</code></li>
+        <li><code>tenant@thingsboard.org / tenant</code> nếu đã load demo data</li>
+      </ul>
+    </section>
+
+    <section class="section">
+      <h2>4. Microservices Local</h2>
+      <p>Mode này dùng khi bạn cần debug flow đúng theo kiến trúc tách service: <code>tb-core</code>, <code>tb-rule-engine</code> và các transports độc lập.</p>
+
+      <h3>Infra bắt buộc</h3>
+      <ul>
+        <li>PostgreSQL trên <code>localhost:5432</code></li>
+        <li>Kafka trên <code>localhost:9092</code></li>
+        <li>ZooKeeper trên <code>localhost:2181</code></li>
+        <li>Redis/Valkey trên <code>localhost:6379</code></li>
+      </ul>
+
+      <h3>Thứ tự khuyến nghị</h3>
+      <ol>
+        <li>Khởi động PostgreSQL.</li>
+        <li>Nếu DB chưa có schema, chạy trước <code>TB - Install DB (monolith demo)</code> để init schema cơ bản.</li>
+        <li>Khởi động Kafka, ZooKeeper, Redis/Valkey.</li>
+        <li>Run <code>TB - Core</code>.</li>
+        <li>Run <code>TB - Rule Engine</code>.</li>
+        <li>Run từng transport cần debug.</li>
+      </ol>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Run config</th>
+            <th>Port mặc định</th>
+            <th>Vai trò</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>TB - Core</code></td>
+            <td><code>8080</code></td>
+            <td>REST API, auth, entity logic, UI static khi build embedded</td>
+          </tr>
+          <tr>
+            <td><code>TB - Rule Engine</code></td>
+            <td><code>8082</code></td>
+            <td>Xử lý rule chains ở mode tách service</td>
+          </tr>
+          <tr>
+            <td><code>TB - HTTP Transport</code></td>
+            <td><code>8081</code></td>
+            <td>HTTP device transport</td>
+          </tr>
+          <tr>
+            <td><code>TB - MQTT Transport</code></td>
+            <td><code>1883 / 8883</code></td>
+            <td>MQTT transport</td>
+          </tr>
+          <tr>
+            <td><code>TB - COAP Transport</code></td>
+            <td><code>5683 / 5684</code></td>
+            <td>CoAP transport</td>
+          </tr>
+          <tr>
+            <td><code>TB - LwM2M Transport</code></td>
+            <td><code>5685 / 5686 / 5687 / 5688</code></td>
+            <td>LwM2M transport và bootstrap server</td>
+          </tr>
+          <tr>
+            <td><code>TB - SNMP Transport</code></td>
+            <td><code>1620</code> và <code>8083</code></td>
+            <td>SNMP transport</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p><span class="warn">Lưu ý:</span> các transport configs được set để chạy theo microservices local, nên sẽ dùng Kafka, ZooKeeper và Redis-compatible cache.</p>
+    </section>
+
+    <section class="section">
+      <h2>5. UI Dev Local</h2>
+      <p>Nếu bạn muốn debug full stack với hot reload cho Angular UI, backend nên chạy local ở <code>8080</code> và UI dev server ở <code>4200</code>.</p>
+
+      <h3>Hiện trạng repo</h3>
+      <ul>
+        <li><code>ui-ngx/proxy.conf.js</code> đang forward về domain remote.</li>
+        <li><code>ui-ngx/src/environments/environment.ts</code> đang đặt <code>apiBaseUrl</code> sang domain remote.</li>
+      </ul>
+
+      <h3>Nếu muốn đổi sang local</h3>
+      <pre><code>// ui-ngx/proxy.conf.js
+const forwardUrl = "http://localhost:8080";
+const wsForwardUrl = "ws://localhost:8080";</code></pre>
+
+      <pre><code>// ui-ngx/src/environments/environment.ts
+apiBaseUrl: 'http://localhost:8080',</code></pre>
+
+      <pre><code>cd ui-ngx
+yarn install
+yarn start</code></pre>
+
+      <p>Sau đó mở <code>http://localhost:4200</code>.</p>
+    </section>
+
+    <section class="section">
+      <h2>6. Gợi Ý Workflow</h2>
+      <h3>Khi sửa backend business logic</h3>
+      <ol>
+        <li>Dùng <code>TB - Monolith Local</code>.</li>
+        <li>Đặt breakpoints trong <code>application</code>, <code>dao</code>, <code>rule-engine</code>.</li>
+      </ol>
+
+      <h3>Khi sửa luồng queue hoặc partitioning</h3>
+      <ol>
+        <li>Dùng <code>TB - Core</code> + <code>TB - Rule Engine</code>.</li>
+        <li>Nếu cần, bật thêm transport cụ thể.</li>
+      </ol>
+
+      <h3>Khi sửa transport protocol</h3>
+      <ol>
+        <li>Chạy <code>TB - Core</code>.</li>
+        <li>Chạy riêng transport đang sửa, ví dụ <code>TB - MQTT Transport</code>.</li>
+      </ol>
+    </section>
+
+    <section class="section">
+      <h2>7. File Liên Quan</h2>
+      <ul>
+        <li><code>.run/README.md</code></li>
+        <li><code>.run/TB - Monolith Local.run.xml</code></li>
+        <li><code>.run/TB - Core.run.xml</code></li>
+        <li><code>.run/TB - Rule Engine.run.xml</code></li>
+        <li><code>.run/TB - HTTP Transport.run.xml</code></li>
+        <li><code>.run/TB - MQTT Transport.run.xml</code></li>
+        <li><code>.run/TB - COAP Transport.run.xml</code></li>
+        <li><code>.run/TB - LwM2M Transport.run.xml</code></li>
+        <li><code>.run/TB - SNMP Transport.run.xml</code></li>
+      </ul>
+    </section>
+
+    <div class="footer">
+      Generated for local repo setup on 2026-03-31.
+    </div>
+  </div>
+</body>
+</html>
