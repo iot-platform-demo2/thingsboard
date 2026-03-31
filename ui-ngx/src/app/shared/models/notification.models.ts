@@ -93,6 +93,7 @@ export interface NotificationSettings {
 }
 
 export interface NotificationDeliveryMethodConfig extends Partial<SlackNotificationDeliveryMethodConfig &
+  ThirdPartyNotificationDeliveryMethodConfig &
   MobileNotificationDeliveryMethodConfig>{
   enabled: boolean;
   method: NotificationDeliveryMethod;
@@ -105,6 +106,14 @@ interface SlackNotificationDeliveryMethodConfig {
 interface MobileNotificationDeliveryMethodConfig {
   firebaseServiceAccountCredentials: string;
   firebaseServiceAccountCredentialsFileName: string;
+}
+
+interface ThirdPartyNotificationDeliveryMethodConfig {
+  url: string;
+  accessTokenEndpoint: string;
+  notifyEndpoint: string;
+  clientId: string;
+  clientSecret: string;
 }
 
 export interface SlackConversation {
@@ -328,6 +337,7 @@ export type DeliveryMethodsTemplates = {
 export interface DeliveryMethodNotificationTemplate extends
   Partial<WebDeliveryMethodNotificationTemplate
     & EmailDeliveryMethodNotificationTemplate
+    & ThirdPartyDeliveryMethodNotificationTemplate
     & SlackDeliveryMethodNotificationTemplate
     & MicrosoftTeamsDeliveryMethodNotificationTemplate
     & MobileDeliveryMethodNotificationTemplate>{
@@ -369,6 +379,9 @@ interface SlackDeliveryMethodNotificationTemplate {
   conversationId: string;
 }
 
+interface ThirdPartyDeliveryMethodNotificationTemplate {
+}
+
 interface MicrosoftTeamsDeliveryMethodNotificationTemplate {
   subject?: string;
   button: NotificationButtonConfig;
@@ -389,6 +402,7 @@ export enum NotificationDeliveryMethod {
   MOBILE_APP = 'MOBILE_APP',
   SMS = 'SMS',
   EMAIL = 'EMAIL',
+  THIRD_PARTY = 'THIRD_PARTY',
   SLACK = 'SLACK',
   MICROSOFT_TEAMS = 'MICROSOFT_TEAMS'
 }
@@ -415,6 +429,11 @@ export const NotificationDeliveryMethodInfoMap = new Map<NotificationDeliveryMet
     {
       name: 'notification.delivery-method.email',
       icon: 'mdi:email'
+    }],
+  [NotificationDeliveryMethod.THIRD_PARTY,
+    {
+      name: 'notification.delivery-method.third-party',
+      icon: 'mdi:api'
     }],
   [NotificationDeliveryMethod.SLACK,
     {

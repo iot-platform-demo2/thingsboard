@@ -28,6 +28,7 @@ import java.io.Serializable;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "method")
 @JsonSubTypes({
         @Type(name = "SLACK", value = SlackNotificationDeliveryMethodConfig.class),
+        @Type(name = "THIRD_PARTY", value = ThirdPartyNotificationDeliveryMethodConfig.class),
         @Type(name = "MOBILE_APP", value = MobileAppNotificationDeliveryMethodConfig.class)
 })
 public interface NotificationDeliveryMethodConfig extends Serializable {

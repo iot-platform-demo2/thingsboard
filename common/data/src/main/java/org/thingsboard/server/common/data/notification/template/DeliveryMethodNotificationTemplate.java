@@ -33,6 +33,7 @@ import java.util.List;
         @Type(name = "WEB", value = WebDeliveryMethodNotificationTemplate.class),
         @Type(name = "EMAIL", value = EmailDeliveryMethodNotificationTemplate.class),
         @Type(name = "SMS", value = SmsDeliveryMethodNotificationTemplate.class),
+        @Type(name = "THIRD_PARTY", value = ThirdPartyDeliveryMethodNotificationTemplate.class),
         @Type(name = "SLACK", value = SlackDeliveryMethodNotificationTemplate.class),
         @Type(name = "MICROSOFT_TEAMS", value = MicrosoftTeamsDeliveryMethodNotificationTemplate.class),
         @Type(name = "MOBILE_APP", value = MobileAppDeliveryMethodNotificationTemplate.class)

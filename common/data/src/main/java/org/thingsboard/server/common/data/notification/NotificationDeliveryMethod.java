@@ -24,6 +24,7 @@ public enum NotificationDeliveryMethod {
     WEB("web"),
     EMAIL("email"),
     SMS("SMS"),
+    THIRD_PARTY("Third-party"),
     SLACK("Slack"),
     MICROSOFT_TEAMS("Microsoft Teams"),
     MOBILE_APP("mobile app");

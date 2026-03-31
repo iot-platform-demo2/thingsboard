@@ -333,7 +333,8 @@ export class SentNotificationDialogComponent extends
 
   allowConfigureDeliveryMethod(deliveryMethod: NotificationDeliveryMethod): boolean {
     const tenantAllowConfigureDeliveryMethod = new Set([
-      NotificationDeliveryMethod.SLACK
+      NotificationDeliveryMethod.SLACK,
+      NotificationDeliveryMethod.THIRD_PARTY
     ]);
     if (deliveryMethod === NotificationDeliveryMethod.WEB) {
       return false;
@@ -355,6 +356,7 @@ export class SentNotificationDialogComponent extends
       case NotificationDeliveryMethod.EMAIL:
         return '/settings/outgoing-mail';
       case NotificationDeliveryMethod.SMS:
+      case NotificationDeliveryMethod.THIRD_PARTY:
       case NotificationDeliveryMethod.SLACK:
       case NotificationDeliveryMethod.MOBILE_APP:
         return '/settings/notifications';

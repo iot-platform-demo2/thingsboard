@@ -188,6 +188,37 @@
     </mat-expansion-panel>
   </section>
   <section class="tb-form-panel tb-slide-toggle stroked"
+           [formGroupName]="NotificationDeliveryMethod.THIRD_PARTY"
+           *ngIf="templateConfigurationForm.get('THIRD_PARTY.enabled').value">
+    <mat-expansion-panel class="tb-settings" expanded="{{ expandedForm(NotificationDeliveryMethod.THIRD_PARTY) }}">
+      <mat-expansion-panel-header class="fill-width flex flex-row flex-wrap">
+        <mat-panel-title class="template-tittle">
+          <tb-icon>{{ NotificationDeliveryMethodInfoMap.get(NotificationDeliveryMethod.THIRD_PARTY).icon }}</tb-icon>
+          {{ NotificationDeliveryMethodInfoMap.get(NotificationDeliveryMethod.THIRD_PARTY).name | translate }}
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      <ng-template matExpansionPanelContent class="tb-extension-panel">
+        <mat-form-field class="mat-block" subscriptSizing="dynamic">
+          <mat-label translate>notification.message</mat-label>
+          <textarea matInput
+                    cdkTextareaAutosize
+                    cols="1"
+                    cdkAutosizeMinRows="1"
+                    formControlName="body">
+          </textarea>
+          <mat-error *ngIf="templateConfigurationForm.get('THIRD_PARTY.body').hasError('required')">
+            {{ 'notification.message-required' | translate }}
+          </mat-error>
+          <mat-error *ngIf="templateConfigurationForm.get('THIRD_PARTY.body').hasError('maxlength')">
+            {{ 'notification.message-max-length' | translate :
+            {length: templateConfigurationForm.get('THIRD_PARTY.body').getError('maxlength').requiredLength}
+            }}
+          </mat-error>
+        </mat-form-field>
+      </ng-template>
+    </mat-expansion-panel>
+  </section>
+  <section class="tb-form-panel tb-slide-toggle stroked"
            [formGroupName]="NotificationDeliveryMethod.EMAIL"
            *ngIf="templateConfigurationForm.get('EMAIL.enabled').value">
     <mat-expansion-panel class="tb-settings" expanded="{{ expandedForm(NotificationDeliveryMethod.EMAIL) }}">

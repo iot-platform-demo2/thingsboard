@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const forwardUrl = "https://newgen.iot-platform.io.vn";
-const wsForwardUrl = "wss://newgen.iot-platform.io.vn";
+// const forwardUrl = "https://newgen.iot-platform.io.vn";
+// const wsForwardUrl = "wss://newgen.iot-platform.io.vn";
+const forwardUrl = "http://localhost:8080";
+const wsForwardUrl = "ws://localhost:8080";
 const ruleNodeUiforwardUrl = forwardUrl;
 
 const PROXY_CONFIG = {

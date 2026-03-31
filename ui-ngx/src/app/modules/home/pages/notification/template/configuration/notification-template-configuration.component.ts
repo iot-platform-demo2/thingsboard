@@ -293,6 +293,11 @@ export class NotificationTemplateConfigurationComponent implements OnDestroy, Co
           body: ['', [Validators.required, Validators.maxLength(320)]]
         });
         break;
+      case NotificationDeliveryMethod.THIRD_PARTY:
+        deliveryMethodForm = this.fb.group({
+          body: ['', [Validators.required, Validators.maxLength(4000)]]
+        });
+        break;
       case NotificationDeliveryMethod.SLACK:
         deliveryMethodForm = this.fb.group({
           body: ['', Validators.required]

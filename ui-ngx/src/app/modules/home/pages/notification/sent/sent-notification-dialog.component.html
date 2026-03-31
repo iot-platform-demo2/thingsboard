@@ -205,6 +205,15 @@
             {{ preview.processedTemplates.SMS.body }}
           </div>
         </section>
+        <section class="preview-group notification tb-form-panel stroked no-gap" *ngIf="preview.processedTemplates.THIRD_PARTY?.enabled">
+          <div class="flex flex-row items-center justify-start gap-2">
+            <tb-icon class="tb-mat-18">mdi:api</tb-icon>
+            <div class="tb-form-panel-title" translate>notification.delivery-method.third-party-preview</div>
+          </div>
+          <div class="notification-content">
+            {{ preview.processedTemplates.THIRD_PARTY.body }}
+          </div>
+        </section>
         <section class="preview-group notification tb-form-panel stroked no-gap" *ngIf="preview.processedTemplates.EMAIL?.enabled">
           <div class="flex flex-row items-center justify-start gap-2">
             <tb-icon class="tb-mat-18">mdi:email</tb-icon>
