@@ -183,11 +183,35 @@ public class DeviceApiController implements TbTransportService {
             @PathVariable("deviceToken") String deviceToken,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "JSON with attribute key-value pairs. See API call description for example.")
             @RequestBody String json) {
+        return postDeviceAttributes(deviceToken, json, false);
+    }
+
+    @Operation(summary = "Post shared attributes (postDeviceSharedAttributes)",
+            description = "Post shared attribute updates on behalf of device. "
+                    + "\n Example of the request: "
+                    + MARKDOWN_CODE_BLOCK_START
+                    + ATTRIBUTE_PAYLOAD_EXAMPLE
+                    + MARKDOWN_CODE_BLOCK_END
+                    + REQUIRE_ACCESS_TOKEN)
+    @RequestMapping(value = "/{deviceToken}/attributes/shared", method = RequestMethod.POST)
+    public DeferredResult<ResponseEntity> postDeviceSharedAttributes(
+            @Parameter(description = ACCESS_TOKEN_PARAM_DESCRIPTION, required = true , schema = @Schema(defaultValue = "YOUR_DEVICE_ACCESS_TOKEN"))
+            @PathVariable("deviceToken") String deviceToken,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "JSON with shared attribute key-value pairs. See API call description for example.")
+            @RequestBody String json) {
+        return postDeviceAttributes(deviceToken, json, true);
+    }
+
+    private DeferredResult<ResponseEntity> postDeviceAttributes(String deviceToken, String json, boolean shared) {
         DeferredResult<ResponseEntity> responseWriter = new DeferredResult<>();
         transportContext.getTransportService().process(DeviceTransportType.DEFAULT, ValidateDeviceTokenRequestMsg.newBuilder().setToken(deviceToken).build(),
                 new DeviceAuthCallback(transportContext, responseWriter, sessionInfo -> {
                     TransportService transportService = transportContext.getTransportService();
-                    transportService.process(sessionInfo, JsonConverter.convertToAttributesProto(JsonParser.parseString(json)),
+                    TransportProtos.PostAttributeMsg postAttributeMsg = JsonConverter.convertToAttributesProto(JsonParser.parseString(json));
+                    if (shared) {
+                        postAttributeMsg = postAttributeMsg.toBuilder().setShared(true).build();
+                    }
+                    transportService.process(sessionInfo, postAttributeMsg,
                             new HttpOkCallback(responseWriter));
                 }));
         return responseWriter;

@@ -15,6 +15,7 @@
  */
 package org.thingsboard.server.system;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.test.context.TestPropertySource;
@@ -72,6 +73,22 @@ public abstract class BaseHttpDeviceApiTest extends AbstractControllerTest {
                 .andExpect(status().isOk());
         Thread.sleep(2000);
         doGetAsync("/api/v1/" + deviceCredentials.getCredentialsId() + "/attributes?clientKeys=keyA,keyB,keyC").andExpect(status().isOk());
+    }
+
+    @Test
+    public void testPostSharedAttributes() throws Exception {
+        Map<String, String> attrMap = new HashMap<>();
+        attrMap.put("sharedKeyA", "sharedValueA");
+        mockMvc.perform(
+                        asyncDispatch(doPost("/api/v1/" + "WRONG_TOKEN" + "/attributes/shared", attrMap, new String[]{}).andReturn()))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(
+                        asyncDispatch(doPost("/api/v1/" + deviceCredentials.getCredentialsId() + "/attributes/shared", attrMap, new String[]{}).andReturn()))
+                .andExpect(status().isOk());
+        Thread.sleep(2000);
+
+        JsonNode attributes = doGetAsync("/api/v1/" + deviceCredentials.getCredentialsId() + "/attributes?sharedKeys=sharedKeyA", JsonNode.class);
+        assertThat(attributes.get("shared").get("sharedKeyA").asText()).isEqualTo("sharedValueA");
     }
 
     @Test
