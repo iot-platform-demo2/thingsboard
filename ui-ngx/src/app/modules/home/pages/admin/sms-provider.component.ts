@@ -45,6 +45,7 @@ export class SmsProviderComponent extends PageComponent implements HasConfirmFor
 
   notificationSettingsForm: FormGroup;
   private notificationSettings: NotificationSettings;
+  thirdPartyTestResult = '';
 
   private readonly authUser: AuthUser;
 
@@ -152,6 +153,27 @@ export class SmsProviderComponent extends PageComponent implements HasConfirmFor
       this.notificationSettings = setting;
       this.notificationSettingsForm.reset(this.notificationSettings);
     });
+  }
+
+  testThirdPartyNotification(): void {
+    const thirdPartyConfig = deepTrim({
+      ...this.notificationSettingsForm.get('deliveryMethodsConfigs.THIRD_PARTY').value,
+      method: 'THIRD_PARTY'
+    });
+    this.notificationService.sendTestThirdPartyNotification(thirdPartyConfig).subscribe({
+      next: (response) => {
+        this.thirdPartyTestResult = JSON.stringify(response, null, 2);
+      },
+      error: (error) => {
+        this.thirdPartyTestResult = JSON.stringify(error?.error || {message: error?.message || 'Unknown error'}, null, 2);
+      }
+    });
+  }
+
+  canTestThirdParty(): boolean {
+    const thirdPartyConfig = this.notificationSettingsForm.get('deliveryMethodsConfigs.THIRD_PARTY').value || {};
+    return ['url', 'accessTokenEndpoint', 'notifyEndpoint', 'clientId', 'clientSecret']
+      .every(key => isNotEmptyStr(thirdPartyConfig[key]));
   }
 
   isSysAdmin(): boolean {

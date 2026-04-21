@@ -159,6 +159,7 @@
         "third-party-notify-endpoint": "Notify endpoint",
         "third-party-client-id": "Client ID",
         "third-party-client-secret": "Client secret",
+        "third-party-test-result": "Test result",
         "sms-provider-type": "SMS provider type",
         "sms-provider-type-required": "SMS provider type is required.",
         "sms-provider-type-aws-sns": "Amazon SNS",

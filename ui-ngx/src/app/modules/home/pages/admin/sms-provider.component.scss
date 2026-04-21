@@ -21,4 +21,8 @@
   .mdc-card__actions {
     padding: 16px;
   }
+
+  textarea[readonly] {
+    font-family: monospace;
+  }
 }

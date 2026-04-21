@@ -50,6 +50,10 @@ import java.util.Map;
 public class ThirdPartyNotificationChannel implements NotificationChannel<User, ThirdPartyDeliveryMethodNotificationTemplate> {
 
     private static final String TEMPLATE_ID = "IOT_NOTIFY";
+    private static final String TEST_TEMPLATE_ID = "IOT_TEST";
+    private static final String DEFAULT_PHONE_NUMBER = "84342225194";
+    private static final String TEST_TYPE = "REDIRECT";
+    private static final String TEST_URL = "https://domain.vn";
 
     private final NotificationSettingsService notificationSettingsService;
 
@@ -62,31 +66,9 @@ public class ThirdPartyNotificationChannel implements NotificationChannel<User, 
     @Override
     public void sendNotification(User recipient, ThirdPartyDeliveryMethodNotificationTemplate processedTemplate,
                                  NotificationProcessingContext ctx) throws Exception {
-        String phoneNumber = recipient.getPhone();
-        if (StringUtils.isBlank(phoneNumber)) {
-            throw new RuntimeException("User does not have phone number");
-        }
-
         ThirdPartyNotificationDeliveryMethodConfig config = ctx.getDeliveryMethodConfig(NotificationDeliveryMethod.THIRD_PARTY);
-        String accessToken = fetchAccessToken(config);
-
-        ObjectNode payload = JacksonUtil.newObjectNode();
-        payload.put("templateId", TEMPLATE_ID);
-        payload.set("params", buildParamsNode(ctx.getRequest().getInfo()));
-
-        ArrayNode phoneNumbers = payload.putArray("phoneNumbers");
-        phoneNumbers.add(phoneNumber);
-
-        ObjectNode data = payload.putObject("data");
-        data.put("type", resolveNotificationType(ctx));
-        data.put("url", config.getUrl());
-        data.set("message", buildMessageNode(processedTemplate, ctx.getRequest().getInfo()));
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(accessToken);
-        HttpEntity<String> request = new HttpEntity<>(JacksonUtil.toString(payload), headers);
-        restTemplate.exchange(new URI(resolveUrl(config.getUrl(), config.getNotifyEndpoint())), HttpMethod.POST, request, String.class);
+        sendRequest(config, resolvePhoneNumber(recipient), resolveNotificationType(ctx), buildMessageNode(processedTemplate, ctx.getRequest().getInfo()),
+                buildParamsNode(ctx.getRequest().getInfo()));
     }
 
     @Override
@@ -100,6 +82,16 @@ public class ThirdPartyNotificationChannel implements NotificationChannel<User, 
     @Override
     public NotificationDeliveryMethod getDeliveryMethod() {
         return NotificationDeliveryMethod.THIRD_PARTY;
+    }
+
+    public JsonNode sendTestNotification(ThirdPartyNotificationDeliveryMethodConfig config) throws Exception {
+        ObjectNode message = JacksonUtil.newObjectNode();
+        message.put("body", "Test third-party notification from ThingsBoard");
+        ObjectNode params = JacksonUtil.newObjectNode();
+        params.put("iot_name", "NewGen");
+        params.put("device", "Test Device");
+        params.put("location", "Test Location");
+        return sendRequest(config, TEST_TEMPLATE_ID, DEFAULT_PHONE_NUMBER, TEST_TYPE, TEST_URL, message, params);
     }
 
     private String fetchAccessToken(ThirdPartyNotificationDeliveryMethodConfig config) throws Exception {
@@ -123,6 +115,39 @@ public class ThirdPartyNotificationChannel implements NotificationChannel<User, 
             throw new RuntimeException("Third-party access token response does not contain a bearer token");
         }
         return accessToken;
+    }
+
+    private JsonNode sendRequest(ThirdPartyNotificationDeliveryMethodConfig config, String phoneNumber, String type,
+                                 JsonNode message, JsonNode params) throws Exception {
+        return sendRequest(config, TEMPLATE_ID, phoneNumber, type, config.getUrl(), message, params);
+    }
+
+    private JsonNode sendRequest(ThirdPartyNotificationDeliveryMethodConfig config, String templateId, String phoneNumber, String type,
+                                 String url, JsonNode message, JsonNode params) throws Exception {
+        String accessToken = fetchAccessToken(config);
+
+        ObjectNode payload = JacksonUtil.newObjectNode();
+        payload.put("templateId", templateId);
+        payload.set("params", params == null ? JacksonUtil.newObjectNode() : params);
+        ArrayNode phoneNumbers = payload.putArray("phoneNumbers");
+        phoneNumbers.add(phoneNumber);
+
+        ObjectNode data = payload.putObject("data");
+        data.put("type", type);
+        data.put("url", url);
+        data.set("message", message);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(accessToken);
+        HttpEntity<String> request = new HttpEntity<>(JacksonUtil.toString(payload), headers);
+        ResponseEntity<JsonNode> response = restTemplate.exchange(
+                new URI(resolveUrl(config.getUrl(), config.getNotifyEndpoint())),
+                HttpMethod.POST,
+                request,
+                JsonNode.class
+        );
+        return response.getBody();
     }
 
     private ObjectNode buildParamsNode(NotificationInfo info) {
@@ -154,6 +179,13 @@ public class ThirdPartyNotificationChannel implements NotificationChannel<User, 
             }
         }
         return ctx.getNotificationType().name();
+    }
+
+    private String resolvePhoneNumber(User recipient) {
+        if (recipient == null || StringUtils.isBlank(recipient.getPhone())) {
+            return DEFAULT_PHONE_NUMBER;
+        }
+        return recipient.getPhone();
     }
 
     private String extractToken(JsonNode node) {

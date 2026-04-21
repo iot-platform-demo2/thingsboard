@@ -15,6 +15,8 @@
  */
 package org.thingsboard.server.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,6 +53,7 @@ import org.thingsboard.server.common.data.notification.NotificationType;
 import org.thingsboard.server.common.data.notification.info.EntitiesLimitIncreaseRequestNotificationInfo;
 import org.thingsboard.server.common.data.notification.info.NotificationInfo;
 import org.thingsboard.server.common.data.notification.settings.NotificationSettings;
+import org.thingsboard.server.common.data.notification.settings.ThirdPartyNotificationDeliveryMethodConfig;
 import org.thingsboard.server.common.data.notification.settings.UserNotificationSettings;
 import org.thingsboard.server.common.data.notification.targets.MicrosoftTeamsNotificationTargetConfig;
 import org.thingsboard.server.common.data.notification.targets.NotificationRecipient;
@@ -73,6 +76,7 @@ import org.thingsboard.server.dao.notification.NotificationTargetService;
 import org.thingsboard.server.dao.notification.NotificationTemplateService;
 import org.thingsboard.server.queue.util.TbCoreComponent;
 import org.thingsboard.server.service.notification.NotificationProcessingContext;
+import org.thingsboard.server.service.notification.channels.ThirdPartyNotificationChannel;
 import org.thingsboard.server.service.security.model.SecurityUser;
 import org.thingsboard.server.service.security.permission.Operation;
 import org.thingsboard.server.service.security.permission.Resource;
@@ -116,6 +120,7 @@ public class NotificationController extends BaseController {
     private final NotificationCenter notificationCenter;
     private final NotificationSettingsService notificationSettingsService;
     private final SystemSecurityService systemSecurityService;
+    private final ThirdPartyNotificationChannel thirdPartyNotificationChannel;
 
     @ApiOperation(value = "Get notifications (getNotifications)",
             notes = "Returns the page of notifications for current user." + NEW_LINE +
@@ -511,6 +516,21 @@ public class NotificationController extends BaseController {
         return notificationSettingsService.findNotificationSettings(tenantId);
     }
 
+    @ApiOperation(value = "Send test third-party notification (sendTestThirdPartyNotification)",
+            notes = "Attempts to send a test notification using provided third-party notification settings." +
+                    SYSTEM_OR_TENANT_AUTHORITY_PARAGRAPH)
+    @PostMapping("/notification/settings/testThirdParty")
+    @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN')")
+    public JsonNode sendTestThirdPartyNotification(@RequestBody JsonNode request,
+                                                   @AuthenticationPrincipal SecurityUser user) throws ThingsboardException {
+        accessControlService.checkPermission(user, Resource.ADMIN_SETTINGS, Operation.READ);
+        try {
+            return thirdPartyNotificationChannel.sendTestNotification(toThirdPartyConfig(request));
+        } catch (Exception e) {
+            throw handleException(e);
+        }
+    }
+
     @ApiOperation(value = "Get available delivery methods (getAvailableDeliveryMethods)",
             notes = "Returns the list of delivery methods that are properly configured and are allowed to be used for sending notifications." +
                     SYSTEM_OR_TENANT_AUTHORITY_PARAGRAPH)
@@ -532,6 +552,27 @@ public class NotificationController extends BaseController {
     @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
     public UserNotificationSettings getUserNotificationSettings(@AuthenticationPrincipal SecurityUser user) {
         return notificationSettingsService.getUserNotificationSettings(user.getTenantId(), user.getId(), true);
+    }
+
+    private ThirdPartyNotificationDeliveryMethodConfig toThirdPartyConfig(JsonNode request) {
+        if (!(request instanceof ObjectNode objectNode)) {
+            throw new IllegalArgumentException("Third-party config request body must be a JSON object");
+        }
+        ThirdPartyNotificationDeliveryMethodConfig config = new ThirdPartyNotificationDeliveryMethodConfig();
+        config.setUrl(readRequiredText(objectNode, "url"));
+        config.setAccessTokenEndpoint(readRequiredText(objectNode, "accessTokenEndpoint"));
+        config.setNotifyEndpoint(readRequiredText(objectNode, "notifyEndpoint"));
+        config.setClientId(readRequiredText(objectNode, "clientId"));
+        config.setClientSecret(readRequiredText(objectNode, "clientSecret"));
+        return config;
+    }
+
+    private String readRequiredText(ObjectNode request, String fieldName) {
+        JsonNode value = request.get(fieldName);
+        if (value == null || value.isNull() || value.asText().isBlank()) {
+            throw new IllegalArgumentException(fieldName + " is required");
+        }
+        return value.asText();
     }
 
 }

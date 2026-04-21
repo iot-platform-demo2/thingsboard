@@ -104,6 +104,10 @@ export class NotificationService {
     return this.http.post<NotificationSettings>('/api/notification/settings', notificationSettings, defaultHttpOptionsFromConfig(config));
   }
 
+  public sendTestThirdPartyNotification(requestBody: any, config?: RequestConfig): Observable<any> {
+    return this.http.post<any>('/api/notification/settings/testThirdParty', requestBody, defaultHttpOptionsFromConfig(config));
+  }
+
   public listSlackConversations(type: SlackChanelType, token?: string, config?: RequestConfig): Observable<Array<SlackConversation>> {
     let url = `/api/notification/slack/conversations?type=${type}`;
     if (isNotEmptyStr(token)) {
