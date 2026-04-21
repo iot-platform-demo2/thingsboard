@@ -394,6 +394,27 @@ public class TelemetryController extends BaseController {
         return saveAttributes(getTenantId(), entityId, scope, request);
     }
 
+    @ApiOperation(value = "Save device control attributes (saveDeviceControlAttributes)",
+            notes = "Creates or updates shared attributes for the selected device. " +
+                    "This endpoint uses the same shared attribute update flow as dashboard widgets, " +
+                    "so subscribed devices receive the shared attribute update notification. " +
+                    SAVE_ATTRIBUTES_REQUEST_PAYLOAD
+                    + TENANT_OR_CUSTOMER_AUTHORITY_PARAGRAPH)
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = SAVE_ATTIRIBUTES_STATUS_OK + SAVE_ENTITY_ATTRIBUTES_STATUS_OK),
+            @ApiResponse(responseCode = "400", description = SAVE_ATTIRIBUTES_STATUS_BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = SAVE_ENTITY_ATTRIBUTES_STATUS_UNAUTHORIZED),
+            @ApiResponse(responseCode = "500", description = SAVE_ENTITY_ATTRIBUTES_STATUS_INTERNAL_SERVER_ERROR),
+    })
+    @PreAuthorize("hasAnyAuthority('SYS_ADMIN', 'TENANT_ADMIN', 'CUSTOMER_USER')")
+    @PostMapping(value = "/DEVICE/{deviceId}/control/attributes")
+    public DeferredResult<ResponseEntity> saveDeviceControlAttributes(@Parameter(description = DEVICE_ID_PARAM_DESCRIPTION, required = true)
+                                                                      @PathVariable("deviceId") String deviceIdStr,
+                                                                      @io.swagger.v3.oas.annotations.parameters.RequestBody(description = ATTRIBUTES_JSON_REQUEST_DESCRIPTION, required = true)
+                                                                      @RequestBody String request) throws ThingsboardException {
+        EntityId entityId = EntityIdFactory.getByTypeAndUuid(EntityType.DEVICE, deviceIdStr);
+        return saveAttributes(getTenantId(), entityId, AttributeScope.SHARED_SCOPE, request);
+    }
 
     @ApiOperation(value = "Save or update time series data (saveEntityTelemetry)",
             notes = "Creates or updates the entity time series data based on the Entity Id and request payload." +

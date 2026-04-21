@@ -15,6 +15,7 @@
  */
 package org.thingsboard.server.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,6 +36,7 @@ import org.thingsboard.server.common.data.security.DeviceCredentialsType;
 import org.thingsboard.server.dao.service.DaoSqlTest;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -235,6 +237,27 @@ public class TelemetryControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    public void testSaveDeviceControlAttributes() throws Exception {
+        loginTenantAdmin();
+        Device device = createDevice();
+
+        String requestBody = JacksonUtil.newObjectNode()
+                .put("targetPower", true)
+                .put("targetMode", "eco")
+                .toString();
+
+        doPostAsync("/api/plugins/telemetry/DEVICE/" + device.getId() + "/control/attributes", requestBody, String.class, status().isOk());
+
+        List<Map<String, Object>> attributes = doGetAsyncTyped("/api/plugins/telemetry/DEVICE/" + device.getId() +
+                "/values/attributes/SHARED_SCOPE?keys=targetPower,targetMode", new TypeReference<>() {
+        });
+        assertThat(findAttrValue("targetPower", attributes)).isEqualTo(true);
+        assertThat(findAttrValue("targetMode", attributes)).isEqualTo("eco");
+
+        doPostAsync("/api/plugins/telemetry/DEVICE/" + device.getId() + "/control/attributes", "{", String.class, status().isBadRequest());
+    }
+
+    @Test
     public void testEmptyKeyIsProhibited() throws Exception {
         loginTenantAdmin();
         Device device = createDevice();
@@ -318,5 +341,13 @@ public class TelemetryControllerTest extends AbstractControllerTest {
         SaveDeviceWithCredentialsRequest saveRequest = new SaveDeviceWithCredentialsRequest(device, deviceCredentials);
 
         return readResponse(doPost("/api/device-with-credentials", saveRequest).andExpect(status().isOk()), Device.class);
+    }
+
+    private static Object findAttrValue(String key, List<Map<String, Object>> attributes) {
+        return attributes.stream()
+                .filter(attribute -> key.equals(attribute.get("key")))
+                .findFirst()
+                .map(attribute -> attribute.get("value"))
+                .orElse(null);
     }
 }
