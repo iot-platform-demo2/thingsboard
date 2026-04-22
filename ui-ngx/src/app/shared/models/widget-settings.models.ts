@@ -87,7 +87,7 @@ export const fontStyleTranslations = new Map<fontStyle, string>(
   ]
 );
 
-export const commonFonts = ['Roboto', 'monospace', 'sans-serif', 'serif'];
+export const commonFonts = ['Rubik', 'Roboto', 'monospace', 'sans-serif', 'serif'];
 
 export interface Font {
   size: number;
@@ -1087,8 +1087,8 @@ export const textStyle = (font?: Font, letterSpacing = 'normal'): ComponentStyle
     style.fontSize = (font.size + (font.sizeUnit || 'px'));
   }
   if (font?.family) {
-    style.fontFamily = font.family +
-      (font.family !== 'Roboto' ? ', Roboto' : '');
+    const primaryFamily = font.family === 'Roboto' ? 'Rubik' : font.family;
+    style.fontFamily = primaryFamily + (primaryFamily !== 'Rubik' ? ', Rubik' : '');
   }
   return style;
 };
@@ -1110,8 +1110,8 @@ export const inlineTextStyle = (font?: Font, letterSpacing = 'normal'): Componen
     style['font-size'] = (font.size + (font.sizeUnit || 'px'));
   }
   if (font?.family) {
-    style['font-family'] = font.family +
-      (font.family !== 'Roboto' ? ', Roboto' : '');
+    const primaryFamily = font.family === 'Roboto' ? 'Rubik' : font.family;
+    style['font-family'] = primaryFamily + (primaryFamily !== 'Rubik' ? ', Rubik' : '');
   }
   return style;
 };

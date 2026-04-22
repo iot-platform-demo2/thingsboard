@@ -15,13 +15,63 @@
  */
 /* You can add global styles to this file, and also import other style files */
 
-@import 'typeface-roboto/index.css';
+@import '@fontsource/rubik/300.css';
+@import '@fontsource/rubik/400.css';
+@import '@fontsource/rubik/500.css';
+@import '@fontsource/rubik/700.css';
 @import 'font-awesome/css/font-awesome.min.css';
 @import 'theme.scss';
 @import './scss/constants';
 @import './scss/animations';
 @import './scss/mixins';
 @import './scss/fonts';
+
+/* Keep legacy Roboto references rendering with Rubik glyphs. */
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 300;
+  src: url('@fontsource/rubik/files/rubik-latin-300-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+  src: url('@fontsource/rubik/files/rubik-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+  src: url('@fontsource/rubik/files/rubik-latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Roboto';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+  src: url('@fontsource/rubik/files/rubik-latin-700-normal.woff2') format('woff2');
+}
+
+:root {
+  --mat-toolbar-container-background-color: #155dfccc;
+}
+
+.tb-default .mat-mdc-button.mat-primary,
+.tb-default .mat-mdc-unelevated-button.mat-primary,
+.tb-default .mat-mdc-raised-button.mat-primary,
+.tb-default .mat-mdc-outlined-button.mat-primary,
+.tb-default .mat-tonal-button.mat-primary {
+  --mat-button-filled-container-color: #155dfccc;
+  --mat-button-outlined-label-text-color: #155dfccc;
+  --mat-button-protected-container-color: #155dfccc;
+}
 
 body, html {
   height: 100%;
@@ -40,7 +90,7 @@ body, html {
 body {
   margin: 0;
   padding: 0;
-  background-color: #eee;
+  background-color: #f0f9ff;
   overflow: hidden;
 }
 
@@ -62,17 +112,22 @@ tb-root {
   box-sizing: border-box;
 }
 
-body,
-button,
-html,
-input,
-select,
-textarea,
-td,
-th {
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+.tb-default,
+.tb-default button,
+.tb-default input,
+.tb-default select,
+.tb-default textarea,
+.tb-default td,
+.tb-default th {
+  font-family: Rubik, "Helvetica Neue", sans-serif;
   font-size: 16px;
 }
+
+/* Ensure Angular emulated-content nodes (_ngcontent-*) do not fall back to Times New Roman. */
+.tb-default *:not(.mat-icon):not(.material-icons):not(.material-icons-round):not(.fa):not(.fab):not(.far):not(.fas):not(code):not(pre):not(kbd):not(samp) {
+  font-family: Rubik, "Helvetica Neue", sans-serif !important;
+}
+
 
 body {
   line-height: normal;
@@ -676,6 +731,7 @@ pre.tb-highlight {
   // Material table
 
   .mat-toolbar.mat-primary {
+    --mat-toolbar-container-background-color: #155dfccc;
     button.mat-mdc-icon-button {
       .mat-icon {
         color: white;
