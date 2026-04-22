@@ -65,13 +65,14 @@ $tb-mat-theme: mat.m2-define-light-theme((
     accent: $tb-accent
   ),
   typography: mat.m2-define-typography-config(
+    $font-family: 'Rubik, "Helvetica Neue", sans-serif',
     $button: mat.m2-define-typography-level(14px, 36px, 500, $letter-spacing: 0.03125em)
   ),
   density: 0
 ));
 
 $tb-theme-system: m2-utils.get-system($tb-mat-theme);
-$tb-theme-system: map_merge($tb-theme-system, ( background: map_get(mat.$m2-grey-palette, 200) ));
+$tb-theme-system: map_merge($tb-theme-system, ( background: #f0f9ff ));
 $tb-theme: map_merge($tb-mat-theme, (_mat-system: $tb-theme-system));
 
 $primary: mat.m2-get-color-from-palette($tb-primary);
@@ -117,7 +118,9 @@ $tb-dark-theme: mat.m2-define-dark-theme((
     primary: $tb-dark-primary,
     accent: $tb-accent
   ),
-  typography: mat.m2-define-typography-config(),
+  typography: mat.m2-define-typography-config(
+    $font-family: 'Rubik, "Helvetica Neue", sans-serif'
+  ),
   density: 0
 ));
 
