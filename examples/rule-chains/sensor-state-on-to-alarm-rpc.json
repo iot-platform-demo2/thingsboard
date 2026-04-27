@@ -1,0 +1,137 @@
+{
+  "ruleChain": {
+    "additionalInfo": {
+      "description": "When a sensor sends telemetry {\"state\":\"on\"}, find the related alarm device using relation Sensor --Triggers--> Alarm and send a one-way RPC method setAlarm with enabled=true."
+    },
+    "name": "Sensor state on to alarm - RPC",
+    "type": "CORE",
+    "firstRuleNodeId": null,
+    "root": false,
+    "debugMode": false,
+    "configuration": null
+  },
+  "metadata": {
+    "firstNodeIndex": 0,
+    "nodes": [
+      {
+        "additionalInfo": {
+          "layoutX": 160,
+          "layoutY": 180
+        },
+        "type": "org.thingsboard.rule.engine.filter.TbMsgTypeSwitchNode",
+        "name": "Message Type Switch",
+        "configuration": {
+          "version": 0
+        }
+      },
+      {
+        "additionalInfo": {
+          "layoutX": 430,
+          "layoutY": 180
+        },
+        "type": "org.thingsboard.rule.engine.filter.TbJsFilterNode",
+        "name": "state == on",
+        "configuration": {
+          "scriptLang": "TBEL",
+          "jsScript": "return msg.state === 'on';",
+          "tbelScript": "return msg.state == 'on';"
+        }
+      },
+      {
+        "additionalInfo": {
+          "layoutX": 700,
+          "layoutY": 180
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbChangeOriginatorNode",
+        "name": "Change originator to alarm",
+        "configuration": {
+          "originatorSource": "RELATED",
+          "relationsQuery": {
+            "direction": "FROM",
+            "maxLevel": 1,
+            "filters": [
+              {
+                "relationType": "Triggers",
+                "entityTypes": [
+                  "DEVICE"
+                ],
+                "negate": false
+              }
+            ],
+            "fetchLastLevelOnly": false
+          },
+          "entityType": null,
+          "entityNamePattern": null
+        }
+      },
+      {
+        "additionalInfo": {
+          "layoutX": 980,
+          "layoutY": 180
+        },
+        "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+        "name": "Build alarm RPC",
+        "configuration": {
+          "scriptLang": "TBEL",
+          "jsScript": "metadata.oneway = 'true';\nreturn {\n  msg: {\n    method: 'setAlarm',\n    params: {\n      enabled: true,\n      sourceState: msg.state\n    }\n  },\n  metadata: metadata,\n  msgType: msgType\n};",
+          "tbelScript": "metadata.oneway = 'true';\nreturn {\n  msg: {\n    method: 'setAlarm',\n    params: {\n      enabled: true,\n      sourceState: msg.state\n    }\n  },\n  metadata: metadata,\n  msgType: msgType\n};"
+        }
+      },
+      {
+        "additionalInfo": {
+          "layoutX": 1260,
+          "layoutY": 180
+        },
+        "type": "org.thingsboard.rule.engine.rpc.TbSendRPCRequestNode",
+        "name": "Send RPC to alarm",
+        "configuration": {
+          "timeoutInSeconds": 10
+        }
+      },
+      {
+        "additionalInfo": {
+          "layoutX": 430,
+          "layoutY": 330
+        },
+        "type": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+        "name": "Save Timeseries",
+        "configurationVersion": 1,
+        "configuration": {
+          "defaultTTL": 0,
+          "useServerTs": false,
+          "processingSettings": {
+            "type": "ON_EVERY_MESSAGE"
+          }
+        }
+      }
+    ],
+    "connections": [
+      {
+        "fromIndex": 0,
+        "toIndex": 1,
+        "type": "Post telemetry"
+      },
+      {
+        "fromIndex": 1,
+        "toIndex": 2,
+        "type": "True"
+      },
+      {
+        "fromIndex": 2,
+        "toIndex": 3,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 3,
+        "toIndex": 4,
+        "type": "Success"
+      },
+      {
+        "fromIndex": 0,
+        "toIndex": 5,
+        "type": "Post telemetry"
+      }
+    ],
+    "ruleChainConnections": null
+  }
+}

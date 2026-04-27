@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="TB - Monolith Fast (Application)" type="Application" factoryName="Application">
+        <option name="MAIN_CLASS_NAME" value="org.thingsboard.server.ThingsboardServerApplication" />
+        <module name="application" />
+        <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+        <option name="VM_PARAMETERS" value="-Dspring.config.name=thingsboard -DSPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/thingsboard -DSPRING_DATASOURCE_USERNAME=postgres -DSPRING_DATASOURCE_PASSWORD=postgres -DTB_SERVICE_TYPE=monolith -DTB_QUEUE_TYPE=in-memory -DCACHE_TYPE=caffeine -DHTTP_BIND_PORT=8080" />
+        <option name="PROGRAM_PARAMETERS" value="" />
+        <option name="PASS_PARENT_ENVS" value="true" />
+        <method v="2">
+            <option name="Make" enabled="true" />
+        </method>
+    </configuration>
+</component>
